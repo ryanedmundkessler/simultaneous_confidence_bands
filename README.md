@@ -14,8 +14,12 @@ This repo houses a Stata function that computes the critical values underlying t
 Sergey Egiev
 <br>Brown University
 
-* Ryan Kessler, Brown University, Email: ryan.edmund.kessler@gmail.com
-* Michael Sielski, Brown University
+Ryan Kessler
+<br>Brown University
+<br>Email: ryan.edmund.kessler@gmail.com
+
+Michael Sielski
+<br>Brown University
 
 ## License
 
