@@ -28,3 +28,7 @@ Michael Sielski
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details
+
+## References
+
+Montiel Olea, José Luis and Mikkel Plagborg-Møller. 2018. Simultaneous Confidence Bands: Theory, Implementation, and an Application to SVARs. Working paper. 
