@@ -11,14 +11,9 @@ This repo houses a Stata function that computes the critical values underlying t
 
 ## Authors 
 
-Sergey Egiev
-Brown University
-
-Ryan Kessler
-Brown University
-
-Michael Sielski
-Brown University
+* Sergey Egiev, Brown University
+* Ryan Kessler, Brown University
+* Michael Sielski, Brown University
 
 ## License
 
