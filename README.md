@@ -31,4 +31,4 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## References
 
-Montiel Olea, José Luis and Mikkel Plagborg-Møller. 2018. Simultaneous Confidence Bands: Theory, Implementation, and an Application to SVARs. Working paper. 
+Montiel Olea, José Luis and Mikkel Plagborg-Møller. 2018. Simultaneous Confidence Bands: Theory, Implementation, and an Application to SVARs. Working paper. Available at https://scholar.princeton.edu/sites/default/files/mikkelpm/files/conf_band.pdf
