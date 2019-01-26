@@ -10,6 +10,7 @@ This repo houses a [Stata](https://www.stata.com/) function that computes the cr
 ```stata
 cap ado uninstall estimate_supt_critical_value
 net install estimate_supt_critical_value, from("https://raw.githubusercontent.com/ryanedmundkessler/simultaneous_confidence_bands/master/ado/")
+```
 
 ## Unit Tests
 
