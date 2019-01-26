@@ -9,9 +9,7 @@ This repo houses a Stata function that computes the critical values underlying t
 
 ## Unit Tests
 
-The repo houses to sets of unit tests. The first set asserts basic functionality. The second set asserts expected coverage rates for a given data generating process. 
-
-Both sets of unit tests can be executed by running the make.py script. 
+The repo houses two sets of unit tests. The first set asserts basic functionality. The second set asserts expected coverage rates for a given data generating process. Both sets of unit tests can be executed by running the make.py script. 
 
 ## Authors 
 
