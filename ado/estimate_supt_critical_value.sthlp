@@ -33,6 +33,17 @@ Example
 
 estimate_supt_critical_value, vcov_matrix(cov_matrix) num_sim(100) conf_level(0.95)
 
+Authors 
+-----------------------------------------------------------------------
+
+Sergey Egiev 
+Brown University
+
+Ryan Kessler
+Brown University
+
+Michael Sielski 
+Brown University
 
 Citations
 -----------------------------------------------------------------------
