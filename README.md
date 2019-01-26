@@ -12,7 +12,7 @@ This repo houses a Stata function that computes the critical values underlying t
 ## Authors 
 
 * Sergey Egiev, Brown University
-* Ryan Kessler, Brown University
+* Ryan Kessler, Brown University, Email: ryan.edmund.kessler@gmail.com
 * Michael Sielski, Brown University
 
 ## License
