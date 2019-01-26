@@ -11,7 +11,7 @@ This repo houses a [Stata](https://www.stata.com/) function that computes the cr
 
 The repo houses two sets of unit tests. 
 
-* [basic_functionality.do](./tests/code/basic_functionality.do) : Asserts basical functionality
+* [basic_functionality.do](./test/code/basic_functionality.do) : Asserts basical functionality
 
 The first set asserts basic functionality. The second set asserts expected coverage rates for a given data generating process. Both sets of unit tests can be executed by running the make.py script. 
 
