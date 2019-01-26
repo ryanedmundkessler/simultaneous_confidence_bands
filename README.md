@@ -11,6 +11,15 @@ This repo houses a Stata function that computes the critical values underlying t
 
 ## Authors 
 
+Sergey Egiev
+Brown University
+
+Ryan Kessler
+Brown University
+
+Michael Sielski
+Brown University
+
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details
