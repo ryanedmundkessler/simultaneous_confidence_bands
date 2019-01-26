@@ -1,0 +1,11 @@
+d estimate_supt_critical_value: Stata module for computing critical value underlying simultaneous sup-t confidence bands
+d
+d Requires: Stata version 14
+d
+d Distribution-Date: 01262019
+d
+d Authors: Sergey Egiev, Ryan Kessler, Michael Sielski
+d Contact: ryan.edmund.kessler@gmail.com
+d
+f estimate_supt_critical_value.ado
+f estimate_supt_critical_value.sthlp
