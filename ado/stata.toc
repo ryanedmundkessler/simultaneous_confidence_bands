@@ -1,0 +1,3 @@
+v 0.1
+d Sergey Egiev, Ryan Kessler, Michael Sielski
+p 'estimate_supt_critical_value': Stata module for computing critical value underlying simultaneous sup-t confidence bands
