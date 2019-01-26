@@ -1,0 +1,99 @@
+
+  ___  ____  ____  ____  ____ (R)
+ /__    /   ____/   /   ____/
+___/   /   /___/   /   /___/   15.0   Copyright 1985-2017 StataCorp LLC
+  Statistics/Data Analysis            StataCorp
+                                      4905 Lakeway Drive
+     Special Edition                  College Station, Texas 77845 USA
+                                      800-STATA-PC        http://www.stata.com
+                                      979-696-4600        stata@stata.com
+                                      979-696-4601 (fax)
+
+110-user Stata network perpetual license:
+       Serial number:  401506201178
+         Licensed to:  Brown University
+                       Brown University
+
+Notes:
+      1.  Stata is running in batch mode.
+      2.  Unicode is supported; see help unicode_advice.
+      3.  Maximum number of variables is set to 5000; see help set_maxvar.
+
+. do "basic_functionality.do" 
+
+. version 14
+
+. adopath + ../../ado
+  [1]  (BASE)      "/Applications/Stata/ado/base/"
+  [2]  (SITE)      "/Applications/ado/"
+  [3]              "."
+  [4]  (PERSONAL)  "/Users/ryankessler/Library/Application Support/Stata/ado/pe
+> rsonal/"
+  [5]  (PLUS)      "/Users/ryankessler/Library/Application Support/Stata/ado/pl
+> us/"
+  [6]  (OLDPLACE)  "~/ado/"
+  [7]              "../../ado"
+
+. 
+. program main
+  1.     matrix non_square = (1, 2 \ 3, 4 \ 5, 6)
+  2.     test_wrong_covariance_matrix, matr(non_square)
+  3. 
+.     matrix negative_definite = (-3, 0, 0 \ 0, -2, 0 \ 0, 0, -1)
+  4.     test_wrong_covariance_matrix, matr(negative_definite)
+  5. 
+.     test_wrong_number_of_simulations, number(100.5)    
+  6.     test_wrong_number_of_simulations, number(-5) 
+  7. 
+.     test_wrong_confidence_level, level(1)
+  8.     test_wrong_confidence_level, level(0)
+  9.     test_wrong_confidence_level, level(-0.5)
+ 10. end
+
+. 
+. program test_wrong_covariance_matrix
+  1.     syntax, matr(name)
+  2. 
+.     cap estimate_supt_critical_value, vcov_matrix(matr)
+  3.     assert _rc > 0
+  4. 
+.     di "Test passed"
+  5. end
+
+. 
+. program test_wrong_number_of_simulations
+  1.     syntax, number(real)
+  2. 
+.     matrix positive_definite = (1, 0.5 \ 0.5, 1)
+  3.     cap estimate_supt_critical_value, vcov_matrix(positive_definite) num_s
+> im(number)
+  4.     assert _rc > 0
+  5. 
+.     di "Test passed"
+  6. end
+
+. 
+. program test_wrong_confidence_level
+  1.     syntax, level(real)
+  2. 
+.     matrix positive_definite = (1, 0.5 \ 0.5, 1)
+  3.     cap estimate_supt_critical_value, vcov_matrix(positive_definite) conf_
+> level(level)
+  4.     assert _rc > 0
+  5.     
+.     di "Test passed"
+  6. end
+
+. 
+. * EXECUTE
+. main
+Test passed
+Test passed
+Test passed
+Test passed
+Test passed
+Test passed
+Test passed
+
+. 
+end of do-file

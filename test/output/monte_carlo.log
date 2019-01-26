@@ -1,0 +1,194 @@
+
+  ___  ____  ____  ____  ____ (R)
+ /__    /   ____/   /   ____/
+___/   /   /___/   /   /___/   15.0   Copyright 1985-2017 StataCorp LLC
+  Statistics/Data Analysis            StataCorp
+                                      4905 Lakeway Drive
+     Special Edition                  College Station, Texas 77845 USA
+                                      800-STATA-PC        http://www.stata.com
+                                      979-696-4600        stata@stata.com
+                                      979-696-4601 (fax)
+
+110-user Stata network perpetual license:
+       Serial number:  401506201178
+         Licensed to:  Brown University
+                       Brown University
+
+Notes:
+      1.  Stata is running in batch mode.
+      2.  Unicode is supported; see help unicode_advice.
+      3.  Maximum number of variables is set to 5000; see help set_maxvar.
+
+. do "monte_carlo.do" 
+
+. version 14
+
+. adopath + ../../ado
+  [1]  (BASE)      "/Applications/Stata/ado/base/"
+  [2]  (SITE)      "/Applications/ado/"
+  [3]              "."
+  [4]  (PERSONAL)  "/Users/ryankessler/Library/Application Support/Stata/ado/pe
+> rsonal/"
+  [5]  (PLUS)      "/Users/ryankessler/Library/Application Support/Stata/ado/pl
+> us/"
+  [6]  (OLDPLACE)  "~/ado/"
+  [7]              "../../ado"
+
+. set matsize 2000
+
+. 
+. program main
+  1.     sup_t_monte_carlo, num_reps(1000)
+  2. end
+
+. 
+. program sup_t_monte_carlo 
+  1.     syntax [, num_reps(int 500) conf_level(real 0.95) ]
+  2. 
+.     simulate pw_critical_value = r(pw_critical_value)                        
+> ///
+>              pw_beta_covered   = r(pw_beta_covered)                          
+> ///
+>              un_critical_value = r(un_critical_value)                        
+> ///
+>              un_beta_covered   = r(un_beta_covered)                          
+> ///
+>              , reps(`num_reps') : is_beta_covered, conf_level(`conf_level') 
+  3.     
+.     sum pw_beta_covered 
+  4.     di "Pointwise coverage rate = " r(mean)         
+  5.     cii `num_reps' `=`num_reps' * `r(mean)''
+  6.     assert r(ub) < `conf_level' 
+  7.     
+.     sum un_beta_covered 
+  8.     di "Uniform sup-t coverage rate = " r(mean)         
+  9.     cii `num_reps' `=`num_reps' * `r(mean)''
+ 10.     assert inrange(`conf_level', r(lb), r(ub)) 
+ 11. end 
+
+. 
+. program is_beta_covered, rclass 
+  1.     syntax [, num_obs(int 1000) sd_epsilon(int 10)                        
+>       ///
+>         num_sim(int 1000) conf_level(real 0.95) ]
+  2. 
+.     simulate_data, num_obs(`num_obs') sd_epsilon(`sd_epsilon') 
+  3. 
+.     reg y x1 x2 x3 
+  4.     matrix beta = e(b)
+  5.     matrix vcov = e(V)
+  6.     local pw_critical_value = invttail(e(df_r), (1 - `conf_level') / 2)
+  7. 
+.     estimate_supt_critical_value, vcov_matrix(vcov)                          
+>    ///
+>         num_sim(`num_sim') conf_level(`conf_level')
+  8.     local un_critical_value = r(critical_value)
+  9. 
+.     mata: build_is_beta_covered(st_matrix("beta"), st_matrix("vcov"),        
+>    ///
+>                                 st_matrix("true_beta"), `pw_critical_value')
+ 10.     local pw_beta_covered = beta_covered 
+ 11.               
+.     mata: build_is_beta_covered(st_matrix("beta"), st_matrix("vcov"),        
+>    ///
+>                                 st_matrix("true_beta"), `un_critical_value')
+ 12.     local un_beta_covered = beta_covered 
+ 13.               
+.     return scalar pw_critical_value = `pw_critical_value' 
+ 14.     return scalar pw_beta_covered   = `pw_beta_covered'
+ 15.     return scalar un_critical_value = `un_critical_value' 
+ 16.     return scalar un_beta_covered   = `un_beta_covered'
+ 17. end 
+
+. 
+. mata:
+------------------------------------------------- mata (type end to exit) -----
+: void build_is_beta_covered(real matrix beta, real matrix vcov_matrix,        
+>    ///
+>                      real matrix true_beta, real scalar critical_value)
+> {
+>     std_error = sqrt(diagonal(vcov_matrix))
+>     
+>     conf_lb = beta' - critical_value * std_error 
+>     conf_ub = beta' + critical_value * std_error
+>     
+>     covered     = (true_beta' :>= conf_lb) :& (true_beta' :<= conf_ub)
+>     min_covered = min(covered)
+>     
+>     st_numscalar("beta_covered", min_covered)
+> }
+
+: end
+-------------------------------------------------------------------------------
+
+. 
+. program simulate_data 
+  1.     syntax [, num_obs(int 1000) sd_epsilon(int 10) ] 
+  2.     
+.     clear
+  3.     set obs `num_obs'
+  4.     matrix cov_x = (1.0, 0.2, 0.6  \    ///
+>                     0.2, 1.0, 0.1  \    ///
+>                     0.6, 0.1, 1.0)
+  5.     drawnorm x1 x2 x3, cov(cov_x)
+  6.     gen epsilon = rnormal(1, `sd_epsilon')
+  7.     
+.     gen y = x1 + x2 + x3 + epsilon 
+  8.     matrix true_beta = (1, 1, 1, 1)
+  9. end
+
+. 
+. * EXECUTE
+. main
+
+         command:  is_beta_covered, conf_level(.95)
+pw_critical_va~e:  r(pw_critical_value)
+ pw_beta_covered:  r(pw_beta_covered)
+un_critical_va~e:  r(un_critical_value)
+ un_beta_covered:  r(un_beta_covered)
+
+Simulations (1000)
+----+--- 1 ---+--- 2 ---+--- 3 ---+--- 4 ---+--- 5 
+..................................................    50
+..................................................   100
+..................................................   150
+..................................................   200
+..................................................   250
+..................................................   300
+..................................................   350
+..................................................   400
+..................................................   450
+..................................................   500
+..................................................   550
+..................................................   600
+..................................................   650
+..................................................   700
+..................................................   750
+..................................................   800
+..................................................   850
+..................................................   900
+..................................................   950
+..................................................  1000
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+pw_beta_co~d |      1,000        .817      .38686          0          1
+Pointwise coverage rate = .817
+
+                                                         -- Binomial Exact --
+    Variable |        Obs        Mean    Std. Err.       [95% Conf. Interval]
+-------------+---------------------------------------------------------------
+             |      1,000        .817    .0122275        .7916134    .8405042
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+un_beta_co~d |      1,000        .951     .215976          0          1
+Uniform sup-t coverage rate = .951
+
+                                                         -- Binomial Exact --
+    Variable |        Obs        Mean    Std. Err.       [95% Conf. Interval]
+-------------+---------------------------------------------------------------
+             |      1,000        .951    .0068263        .9357339    .9635329
+
+. 
+end of do-file
