@@ -14,7 +14,7 @@ net install estimate_supt_critical_value, from("https://raw.githubusercontent.co
 
 ## Unit Tests
 
-The repo houses two sets of unit tests. 
+The repo houses two sets of unit tests:
 
 * [basic_functionality.do](./test/code/basic_functionality.do) : Asserts basic functionality
 * [monte_carlo.do](./test/code/monte_carlo.do) : Asserts expected coverage rates for a given data generating process 
