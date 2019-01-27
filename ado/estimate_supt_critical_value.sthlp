@@ -31,7 +31,12 @@ r(critical_value): Critical value underlying simultaneous sup-t confidence band
 Example
 -----------------------------------------------------------------------
 
-estimate_supt_critical_value, vcov_matrix(cov_matrix) num_sim(100) conf_level(0.95)
+sysuse auto, clear
+
+reg mpg price weight foreign
+matrix vcov_matrix = e(V)
+
+estimate_supt_critical_value, vcov_matrix(vcov_matrix) num_sim(100) conf_level(0.95)
 
 Authors 
 -----------------------------------------------------------------------
