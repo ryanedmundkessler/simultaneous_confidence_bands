@@ -1,0 +1,287 @@
+
+  ___  ____  ____  ____  ____ (R)
+ /__    /   ____/   /   ____/
+___/   /   /___/   /   /___/   15.0   Copyright 1985-2017 StataCorp LLC
+  Statistics/Data Analysis            StataCorp
+                                      4905 Lakeway Drive
+     Special Edition                  College Station, Texas 77845 USA
+                                      800-STATA-PC        http://www.stata.com
+                                      979-696-4600        stata@stata.com
+                                      979-696-4601 (fax)
+
+110-user Stata network perpetual license:
+       Serial number:  401506201178
+         Licensed to:  Brown University
+                       Brown University
+
+Notes:
+      1.  Stata is running in batch mode.
+      2.  Unicode is supported; see help unicode_advice.
+      3.  Maximum number of variables is set to 5000; see help set_maxvar.
+
+. do "example.do" 
+
+. version 14
+
+. adopath + ../../ado
+  [1]  (BASE)      "/Applications/Stata/ado/base/"
+  [2]  (SITE)      "/Applications/ado/"
+  [3]              "."
+  [4]  (PERSONAL)  "/Users/ryankessler/Library/Application Support/Stata/ado/pe
+> rsonal/"
+  [5]  (PLUS)      "/Users/ryankessler/Library/Application Support/Stata/ado/pl
+> us/"
+  [6]  (OLDPLACE)  "~/ado/"
+  [7]              "../../ado"
+
+. set matsize 2000
+
+. set scheme s1color 
+
+. 
+. program main
+  1.     simulate_data, num_units(2000) num_time_periods(80)
+  2. 
+.     run_regression, conf_level(0.95)
+  3.     local pw_critical_value = r(pw_critical_value)
+  4.     local un_critical_value = r(un_critical_value)
+  5. 
+.     build_plot ../output/event_study_pw_un_conf_bands.pdf,                  /
+> //
+>         pw_critical_value(`pw_critical_value')                              /
+> //
+>         un_critical_value(`un_critical_value')
+  6. end
+
+. 
+. program simulate_data  
+  1.     syntax [, num_units(int 2000) num_time_periods(int 80) base_month(str)
+>   ///
+>         unit_fe(real 1) causal_effect(real 1) sd_error(real 5) ]
+  2.     if "`base_month'" == "" local base_month "`=ym(2006,12)'"
+  3.     
+.     set obs `=`num_units' * `num_time_periods''
+  4.     
+.     gen unit_id = ceil(_n / `num_time_periods') + 1000
+  5.     bysort unit_id : gen year_month = `base_month' + _n 
+  6.     bysort unit_id : gen policy_month = int(uniform() * `num_time_periods'
+>  + `base_month' + 1) if _n == 1
+  7.     format year_month policy_month %tm 
+  8.     
+.     bysort unit_id : carryforward policy_month, replace 
+  9.     gen relative_month = year_month - policy_month 
+ 10.     gen z = relative_month >= 0 
+ 11.     gen y = `unit_fe' * (unit_id - 1000) + `causal_effect' * z + rnormal(0
+> , `sd_error')
+ 12. 
+.     egen relative_month_ind = group(relative_month)
+ 13.     replace relative_month_ind = 1000 if relative_month < -12 
+ 14.     replace relative_month_ind = 2000 if relative_month > 12
+ 15.     
+.     xtset unit_id year_month 
+ 16.     assert r(balanced) == "strongly balanced"
+ 17. end
+
+. 
+. program run_regression, rclass 
+  1.     syntax, conf_level(real) 
+  2.     areg y ib79.relative_month_ind i.year_month, absorb(unit_id) cluster(u
+> nit_id)
+  3.     
+.     local pw_critical_value = invttail(e(df_r), (1 - `conf_level') / 2)
+  4.     matrix vcov_matrix = e(V)
+  5. 
+.     estimate_supt_critical_value, vcov_matrix(vcov_matrix) conf_level(`conf_l
+> evel')
+  6.     local un_critical_value = r(critical_value)
+  7. 
+.     return scalar pw_critical_value = `pw_critical_value'
+  8.     return scalar un_critical_value = `un_critical_value'
+  9. end 
+
+. 
+. program build_plot
+  1.     syntax anything(name = out_file), pw_critical_value(real) un_critical_
+> value(real)
+  2. 
+.     preserve 
+  3.         regsave 
+  4.         keep if strpos(var, ".relative_month_ind") 
+  5.         drop if inlist(var, "1000.relative_month_ind", "2000.relative_mont
+> h_ind")
+  6.         
+.         gen relative_month = substr(var, 1, 2)
+  7.         destring relative_month, replace
+  8.     
+.         sum relative_month if strpos(var, "b.relative_month_ind")
+  9.         replace relative_month = relative_month - (r(mean) + 1)
+ 10.     
+.         foreach cv_type in pw un {
+ 11.             gen `cv_type'_ci_ub = coef + ``cv_type'_critical_value' * stde
+> rr 
+ 12.             gen `cv_type'_ci_lb = coef - ``cv_type'_critical_value' * stde
+> rr
+ 13.         }
+ 14.     
+.         twoway rcap pw_ci_lb pw_ci_ub relative_month,                   ///
+>                    color(black) msize(medlarge)                      || ///
+>                rspike un_ci_lb un_ci_ub relative_month, color(black) || ///
+>                scatter coef relative_month, mcolor(black)               ///
+>                legend(order(1 "Pointwise confidence band"               ///
+>                             2 "Sup-t confidence band"))                 ///
+>                xtitle("Months relative to event") xlabel(-12(2)12)      ///
+>                ytitle("Coefficient estimate")                           ///
+>                yline(0, lwidth(vthin) lpattern(dash) lcolor(black))
+ 15. 
+.         graph export `out_file', as(pdf) replace 
+ 16.     restore
+ 17. end
+
+. 
+. * EXECUTE
+. main
+number of observations (_N) was 0, now 160,000
+(158,000 missing values generated)
+policy_month:  (158,000 real changes made)
+(58,267 real changes made)
+(55,688 real changes made)
+       panel variable:  unit_id (strongly balanced)
+        time variable:  year_month, 2007m1 to 2013m8
+                delta:  1 month
+
+Linear regression, absorbing indicators         Number of obs     =    160,000
+                                                F( 105,   1999)   =      11.11
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.9999
+                                                Adj R-squared     =     0.9999
+                                                Root MSE          =     5.0147
+
+                            (Std. Err. adjusted for 2,000 clusters in unit_id)
+------------------------------------------------------------------------------
+             |               Robust
+           y |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+relative_m~d |
+         68  |  -.0432803   .1666135    -0.26   0.795    -.3700345    .2834739
+         69  |  -.1513785   .1679219    -0.90   0.367    -.4806988    .1779417
+         70  |    .105147   .1720088     0.61   0.541    -.2321883    .4424824
+         71  |   -.233084   .1650539    -1.41   0.158    -.5567797    .0906117
+         72  |   .0332443   .1638414     0.20   0.839    -.2880736    .3545621
+         73  |   -.257207   .1616864    -1.59   0.112    -.5742985    .0598844
+         74  |  -.0078857   .1674802    -0.05   0.962    -.3363397    .3205684
+         75  |   .1832469   .1636322     1.12   0.263    -.1376607    .5041544
+         76  |  -.1723021   .1656513    -1.04   0.298    -.4971694    .1525651
+         77  |   .0664728   .1658135     0.40   0.689    -.2587125    .3916582
+         78  |   -.022348   .1613742    -0.14   0.890    -.3388272    .2941311
+         80  |   1.085591   .1580488     6.87   0.000     .7756339    1.395549
+         81  |   .9623995   .1633608     5.89   0.000     .6420242    1.282775
+         82  |   .7823786   .1614685     4.85   0.000     .4657145    1.099043
+         83  |   .8977421   .1637691     5.48   0.000      .576566    1.218918
+         84  |   1.032538   .1627552     6.34   0.000       .71335    1.351725
+         85  |   .8207593    .161892     5.07   0.000     .5032646    1.138254
+         86  |   .8984434   .1636714     5.49   0.000     .5774591    1.219428
+         87  |   .9024151   .1644064     5.49   0.000     .5799893    1.224841
+         88  |   .9822268   .1672775     5.87   0.000     .6541704    1.310283
+         89  |   .9599043   .1688896     5.68   0.000     .6286863    1.291122
+         90  |   1.073471   .1676636     6.40   0.000     .7446568    1.402284
+         91  |   1.118435    .165437     6.76   0.000     .7939884    1.442882
+         92  |   .9016187   .1700278     5.30   0.000     .5681685    1.235069
+       1000  |  -.0293905    .120575    -0.24   0.807    -.2658563    .2070754
+       2000  |    .914246   .1230793     7.43   0.000     .6728689    1.155623
+             |
+  year_month |
+        565  |  -.0085069   .1575888    -0.05   0.957    -.3175624    .3005486
+        566  |  -.2130879   .1597406    -1.33   0.182    -.5263634    .1001877
+        567  |   -.076484   .1630922    -0.47   0.639    -.3963324    .2433645
+        568  |   .0557695    .161612     0.35   0.730    -.2611761    .3727151
+        569  |   .0488393   .1622735     0.30   0.763    -.2694037    .3670823
+        570  |   .1376145   .1621779     0.85   0.396     -.180441    .4556699
+        571  |   .1202142   .1601005     0.75   0.453    -.1937672    .4341956
+        572  |  -.0579351   .1582787    -0.37   0.714    -.3683436    .2524734
+        573  |  -.0585166   .1576969    -0.37   0.711    -.3677842    .2507509
+        574  |  -.0883133   .1583758    -0.56   0.577    -.3989123    .2222857
+        575  |   .1887952   .1581195     1.19   0.233    -.1213011    .4988915
+        576  |  -.0223253   .1555299    -0.14   0.886     -.327343    .2826923
+        577  |  -.1403047   .1632378    -0.86   0.390    -.4604387    .1798292
+        578  |  -.1252578   .1580572    -0.79   0.428    -.4352319    .1847163
+        579  |  -.0674642   .1626015    -0.41   0.678    -.3863505     .251422
+        580  |   .0986013   .1577297     0.63   0.532    -.2107306    .4079331
+        581  |  -.1543202   .1594514    -0.97   0.333    -.4670284    .1583881
+        582  |  -.0152951   .1627167    -0.09   0.925    -.3344071    .3038169
+        583  |  -.0969773   .1658786    -0.58   0.559    -.4222904    .2283358
+        584  |   .0998928   .1595492     0.63   0.531    -.2130073    .4127928
+        585  |  -.0599126   .1655172    -0.36   0.717    -.3845168    .2646916
+        586  |   .0564695   .1585867     0.36   0.722     -.254543    .3674821
+        587  |  -.1985286   .1618783    -1.23   0.220    -.5159964    .1189393
+        588  |   .1635361   .1636464     1.00   0.318    -.1573992    .4844714
+        589  |  -.0432659   .1606264    -0.27   0.788    -.3582786    .2717468
+        590  |  -.2003599   .1629669    -1.23   0.219    -.5199628    .1192429
+        591  |  -.0084437   .1638493    -0.05   0.959     -.329777    .3128895
+        592  |   .0623703   .1621801     0.38   0.701    -.2556894    .3804301
+        593  |    .052553   .1604455     0.33   0.743     -.262105    .3672109
+        594  |   .0579527    .165154     0.35   0.726    -.2659393    .3818447
+        595  |  -.0004441   .1594988    -0.00   0.998    -.3132453    .3123571
+        596  |  -.0633082   .1671866    -0.38   0.705    -.3911865      .26457
+        597  |  -.2085514   .1637077    -1.27   0.203    -.5296071    .1125042
+        598  |   .0536784   .1645155     0.33   0.744    -.2689614    .3763181
+        599  |  -.1111647   .1662294    -0.67   0.504    -.4371658    .2148363
+        600  |   .0790504   .1606218     0.49   0.623    -.2359533    .3940541
+        601  |  -.1510333   .1583507    -0.95   0.340     -.461583    .1595163
+        602  |  -.1264749   .1633819    -0.77   0.439    -.4468916    .1939417
+        603  |   .0231603   .1630966     0.14   0.887    -.2966968    .3430173
+        604  |   -.197118   .1649173    -1.20   0.232    -.5205459    .1263099
+        605  |   .0822982   .1636122     0.50   0.615    -.2385702    .4031665
+        606  |  -.1568945   .1672088    -0.94   0.348    -.4848163    .1710274
+        607  |  -.1054571   .1593396    -0.66   0.508    -.4179461    .2070319
+        608  |  -.1399395   .1679398    -0.83   0.405    -.4692949    .1894159
+        609  |   .0105312   .1673778     0.06   0.950     -.317722    .3387843
+        610  |   .2064622   .1635364     1.26   0.207    -.1142573    .5271818
+        611  |  -.1570039    .163922    -0.96   0.338    -.4784797    .1644719
+        612  |    .084391   .1692739     0.50   0.618    -.2475808    .4163627
+        613  |   .0964314   .1675389     0.58   0.565    -.2321378    .4250006
+        614  |   .0647286   .1669711     0.39   0.698    -.2627269    .3921842
+        615  |  -.0656145   .1650347    -0.40   0.691    -.3892724    .2580435
+        616  |    .144038   .1692956     0.85   0.395    -.1879764    .4760524
+        617  |   .1777164   .1665406     1.07   0.286    -.1488949    .5043277
+        618  |  -.1047438   .1648497    -0.64   0.525     -.428039    .2185515
+        619  |  -.2014307   .1705662    -1.18   0.238    -.5359369    .1330754
+        620  |  -.0382979   .1634786    -0.23   0.815    -.3589042    .2823085
+        621  |   .0945222   .1662908     0.57   0.570    -.2315992    .4206436
+        622  |   -.062246   .1672496    -0.37   0.710    -.3902479    .2657559
+        623  |   .0155004   .1689215     0.09   0.927    -.3157803    .3467811
+        624  |   .1184287    .168922     0.70   0.483    -.2128529    .4497103
+        625  |   .0388106   .1697194     0.23   0.819    -.2940348    .3716561
+        626  |   .0803743   .1696626     0.47   0.636    -.2523597    .4131084
+        627  |   .0333047   .1697795     0.20   0.845    -.2996586     .366268
+        628  |    .061556   .1678984     0.37   0.714    -.2677182    .3908301
+        629  |   .0718166   .1702693     0.42   0.673    -.2621072    .4057404
+        630  |  -.0603837   .1719091    -0.35   0.725    -.3975236    .2767561
+        631  |   .2725881    .170361     1.60   0.110    -.0615157    .6066918
+        632  |  -.0559756   .1732654    -0.32   0.747    -.3957753    .2838241
+        633  |  -.0796098   .1725317    -0.46   0.645    -.4179705     .258751
+        634  |  -.0568554    .169287    -0.34   0.737    -.3888529    .2751421
+        635  |   .1162443   .1697794     0.68   0.494    -.2167187    .4492073
+        636  |   .0284676   .1709244     0.17   0.868     -.306741    .3636763
+        637  |    .062308   .1739219     0.36   0.720    -.2787792    .4033952
+        638  |  -.1929856   .1726602    -1.12   0.264    -.5315984    .1456272
+        639  |   .0619773   .1725742     0.36   0.720    -.2764669    .4004214
+        640  |  -.0592488   .1740948    -0.34   0.734     -.400675    .2821775
+        641  |  -.0312855   .1737388    -0.18   0.857    -.3720136    .3094427
+        642  |   .0779768    .172044     0.45   0.650    -.2594276    .4153812
+        643  |   .1720541   .1733783     0.99   0.321    -.1679669    .5120751
+             |
+       _cons |   1000.562   .1632123  6130.43   0.000     1000.242    1000.882
+-------------+----------------------------------------------------------------
+     unit_id |   absorbed                                    (2000 categories)
+(81 observations deleted)
+(2 observations deleted)
+relative_month: all characters numeric; replaced as byte
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+relative_m~h |          1          79           .         79         79
+(25 real changes made)
+(file ../output/event_study_pw_un_conf_bands.pdf written in PDF format)
+
+. 
+end of do-file
