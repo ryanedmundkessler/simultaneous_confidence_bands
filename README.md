@@ -12,6 +12,10 @@ cap ado uninstall estimate_supt_critical_value
 net install estimate_supt_critical_value, from("https://raw.githubusercontent.com/ryanedmundkessler/simultaneous_confidence_bands/master/ado/")
 ```
 
+## Example
+
+[example.do](./example/code/example.do) shows how the simultaneous sup-t confidence bands can be estimated and plotted alongside their pointwise counterparts 
+
 ## Unit Tests
 
 The repo houses two sets of unit tests:
