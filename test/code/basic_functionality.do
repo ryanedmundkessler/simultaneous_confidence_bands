@@ -1,7 +1,11 @@
 version 14
 adopath + ../../ado
+set matsize 2000
+set seed 1928384
 
 program main
+    test_return_function 
+
     matrix non_square = (1, 2 \ 3, 4 \ 5, 6)
     test_wrong_covariance_matrix, matr(non_square)
 
@@ -15,6 +19,18 @@ program main
     test_wrong_confidence_level, level(0)
     test_wrong_confidence_level, level(-0.5)
 end
+
+program test_return_function
+    sysuse auto, clear
+
+    reg mpg price weight trunk 
+    matrix vcov_matrix = e(V)
+
+    estimate_supt_critical_value, vcov_matrix(vcov_matrix)
+    assert "`r(critical_value)'" != ""
+
+    di "Test passed"
+end 
 
 program test_wrong_covariance_matrix
     syntax, matr(name)

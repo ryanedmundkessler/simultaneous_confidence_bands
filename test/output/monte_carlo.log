@@ -1,7 +1,7 @@
 
   ___  ____  ____  ____  ____ (R)
  /__    /   ____/   /   ____/
-___/   /   /___/   /   /___/   15.0   Copyright 1985-2017 StataCorp LLC
+___/   /   /___/   /   /___/   15.1   Copyright 1985-2017 StataCorp LLC
   Statistics/Data Analysis            StataCorp
                                       4905 Lakeway Drive
      Special Edition                  College Station, Texas 77845 USA
@@ -35,6 +35,8 @@ Notes:
   [7]              "../../ado"
 
 . set matsize 2000
+
+. set seed 1928384
 
 . 
 . program main
@@ -172,23 +174,23 @@ Simulations (1000)
 
     Variable |        Obs        Mean    Std. Dev.       Min        Max
 -------------+---------------------------------------------------------
-pw_beta_co~d |      1,000        .817      .38686          0          1
-Pointwise coverage rate = .817
+pw_beta_co~d |      1,000        .834    .3722668          0          1
+Pointwise coverage rate = .834
 
                                                          -- Binomial Exact --
     Variable |        Obs        Mean    Std. Err.       [95% Conf. Interval]
 -------------+---------------------------------------------------------------
-             |      1,000        .817    .0122275        .7916134    .8405042
+             |      1,000        .834    .0117662        .8094632    .8565513
 
     Variable |        Obs        Mean    Std. Dev.       Min        Max
 -------------+---------------------------------------------------------
-un_beta_co~d |      1,000        .951     .215976          0          1
-Uniform sup-t coverage rate = .951
+un_beta_co~d |      1,000        .948    .2221381          0          1
+Uniform sup-t coverage rate = .948
 
                                                          -- Binomial Exact --
     Variable |        Obs        Mean    Std. Err.       [95% Conf. Interval]
 -------------+---------------------------------------------------------------
-             |      1,000        .951    .0068263        .9357339    .9635329
+             |      1,000        .948    .0070211         .932365    .9609235
 
 . 
 end of do-file

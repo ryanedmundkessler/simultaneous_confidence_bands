@@ -1,6 +1,7 @@
 version 14
 adopath + ../../ado
 set matsize 2000
+set seed 1928384
 
 program main
     sup_t_monte_carlo, num_reps(1000)
