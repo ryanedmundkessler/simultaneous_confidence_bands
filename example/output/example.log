@@ -1,7 +1,7 @@
 
   ___  ____  ____  ____  ____ (R)
  /__    /   ____/   /   ____/
-___/   /   /___/   /   /___/   15.0   Copyright 1985-2017 StataCorp LLC
+___/   /   /___/   /   /___/   15.1   Copyright 1985-2017 StataCorp LLC
   Statistics/Data Analysis            StataCorp
                                       4905 Lakeway Drive
      Special Edition                  College Station, Texas 77845 USA
@@ -46,7 +46,7 @@ Notes:
   3.     local pw_critical_value = r(pw_critical_value)
   4.     local un_critical_value = r(un_critical_value)
   5. 
-.     build_plot ../output/event_study_pw_un_conf_bands.pdf,                  /
+.     build_plot ../output/event_study_pw_un_conf_bands,                      /
 > //
 >         pw_critical_value(`pw_critical_value')                              /
 > //
@@ -133,7 +133,7 @@ Notes:
 >                ytitle("Coefficient estimate")                           ///
 >                yline(0, lwidth(vthin) lpattern(dash) lcolor(black))
  15. 
-.         graph export `out_file', as(pdf) replace 
+.         graph export `out_file'.pdf, as(pdf) replace
  16.     restore
  17. end
 
@@ -150,6 +150,7 @@ policy_month:  (158,000 real changes made)
                 delta:  1 month
 
 Linear regression, absorbing indicators         Number of obs     =    160,000
+Absorbed variable: unit_id                      No. of categories =      2,000
                                                 F( 105,   1999)   =      11.11
                                                 Prob > F          =     0.0000
                                                 R-squared         =     0.9999
@@ -271,8 +272,7 @@ relative_m~d |
         643  |   .1720541   .1733783     0.99   0.321    -.1679669    .5120751
              |
        _cons |   1000.562   .1632123  6130.43   0.000     1000.242    1000.882
--------------+----------------------------------------------------------------
-     unit_id |   absorbed                                    (2000 categories)
+------------------------------------------------------------------------------
 (81 observations deleted)
 (2 observations deleted)
 relative_month: all characters numeric; replaced as byte

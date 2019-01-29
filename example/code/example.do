@@ -10,7 +10,7 @@ program main
     local pw_critical_value = r(pw_critical_value)
     local un_critical_value = r(un_critical_value)
 
-    build_plot ../output/event_study_pw_un_conf_bands.pdf,                  ///
+    build_plot ../output/event_study_pw_un_conf_bands,                      ///
         pw_critical_value(`pw_critical_value')                              ///
         un_critical_value(`un_critical_value')
 end
@@ -83,7 +83,7 @@ program build_plot
                ytitle("Coefficient estimate")                           ///
                yline(0, lwidth(vthin) lpattern(dash) lcolor(black))
 
-        graph export `out_file', as(pdf) replace 
+        graph export `out_file'.pdf, as(pdf) replace
     restore
 end
 
