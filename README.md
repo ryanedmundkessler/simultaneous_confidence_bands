@@ -23,7 +23,7 @@ The repo houses two sets of unit tests:
 * [basic_functionality.do](./test/code/basic_functionality.do) : This set asserts basic functionality
 * [monte_carlo.do](./test/code/monte_carlo.do) : This set asserts expected coverage rates for a given data generating process 
 
-Both sets of unit tests can be executed by running [make.py](./test/code/make.py).
+Both sets of unit tests can be executed by running [make.py](./make.py).
 
 ## Authors 
 
