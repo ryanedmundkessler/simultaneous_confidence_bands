@@ -174,23 +174,23 @@ Simulations (1000)
 
     Variable |        Obs        Mean    Std. Dev.       Min        Max
 -------------+---------------------------------------------------------
-pw_beta_co~d |      1,000        .834    .3722668          0          1
-Pointwise coverage rate = .834
+pw_beta_co~d |      1,000        .827    .3784365          0          1
+Pointwise coverage rate = .827
 
                                                          -- Binomial Exact --
     Variable |        Obs        Mean    Std. Err.       [95% Conf. Interval]
 -------------+---------------------------------------------------------------
-             |      1,000        .834    .0117662        .8094632    .8565513
+             |      1,000        .827    .0119612        .8021034    .8499536
 
     Variable |        Obs        Mean    Std. Dev.       Min        Max
 -------------+---------------------------------------------------------
-un_beta_co~d |      1,000        .948    .2221381          0          1
-Uniform sup-t coverage rate = .948
+un_beta_co~d |      1,000        .945    .2280943          0          1
+Uniform sup-t coverage rate = .945
 
                                                          -- Binomial Exact --
     Variable |        Obs        Mean    Std. Err.       [95% Conf. Interval]
 -------------+---------------------------------------------------------------
-             |      1,000        .948    .0070211         .932365    .9609235
+             |      1,000        .945    .0072094        .9290085    .9583012
 
 . 
 end of do-file

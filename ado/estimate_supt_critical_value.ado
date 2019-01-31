@@ -1,6 +1,9 @@
 program estimate_supt_critical_value, rclass
-    syntax, vcov_matrix(name) [ num_sim(int 1000) conf_level(real 0.95) ]
-    
+    syntax, vcov_matrix(name) [ seed(int 192837) num_sim(int 1000) conf_level(real 0.95) ]
+
+    local initial_rng_state = c(rngstate)
+    set seed `seed'
+
     capture assert `conf_level' > 0 & `conf_level' < 1
     if _rc == 9 {
         di as error "Confidence level must live in (0, 1)"
@@ -23,6 +26,7 @@ program estimate_supt_critical_value, rclass
                              `conf_level', `num_sim')
 
     return scalar critical_value = critical_value
+    set rngstate `initial_rng_state'
 end
 
 mata:

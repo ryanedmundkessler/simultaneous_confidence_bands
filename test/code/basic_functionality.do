@@ -5,6 +5,7 @@ set seed 1928384
 
 program main
     test_return_function 
+    test_stability
 
     matrix non_square = (1, 2 \ 3, 4 \ 5, 6)
     test_wrong_covariance_matrix, matr(non_square)
@@ -23,11 +24,31 @@ end
 program test_return_function
     sysuse auto, clear
 
-    reg mpg price weight trunk 
+    qui reg mpg price weight trunk 
     matrix vcov_matrix = e(V)
 
     estimate_supt_critical_value, vcov_matrix(vcov_matrix)
     assert "`r(critical_value)'" != ""
+
+    di "Test passed"
+end 
+
+program test_stability
+    sysuse auto, clear
+
+    qui reg mpg price weight trunk 
+    matrix vcov_matrix = e(V)
+
+    estimate_supt_critical_value, vcov_matrix(vcov_matrix)
+    local critical_value_r1 = r(critical_value)
+
+    qui reg mpg price weight trunk 
+    matrix vcov_matrix = e(V)
+
+    estimate_supt_critical_value, vcov_matrix(vcov_matrix)
+    local critical_value_r2 = r(critical_value)
+
+    assert `critical_value_r1' == `critical_value_r2'
 
     di "Test passed"
 end 

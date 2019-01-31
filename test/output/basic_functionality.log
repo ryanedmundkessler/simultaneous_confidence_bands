@@ -41,26 +41,27 @@ Notes:
 . 
 . program main
   1.     test_return_function 
-  2. 
+  2.     test_stability
+  3. 
 .     matrix non_square = (1, 2 \ 3, 4 \ 5, 6)
-  3.     test_wrong_covariance_matrix, matr(non_square)
-  4. 
+  4.     test_wrong_covariance_matrix, matr(non_square)
+  5. 
 .     matrix negative_definite = (-3, 0, 0 \ 0, -2, 0 \ 0, 0, -1)
-  5.     test_wrong_covariance_matrix, matr(negative_definite)
-  6. 
+  6.     test_wrong_covariance_matrix, matr(negative_definite)
+  7. 
 .     test_wrong_number_of_simulations, number(100.5)    
-  7.     test_wrong_number_of_simulations, number(-5) 
-  8. 
+  8.     test_wrong_number_of_simulations, number(-5) 
+  9. 
 .     test_wrong_confidence_level, level(1)
-  9.     test_wrong_confidence_level, level(0)
- 10.     test_wrong_confidence_level, level(-0.5)
- 11. end
+ 10.     test_wrong_confidence_level, level(0)
+ 11.     test_wrong_confidence_level, level(-0.5)
+ 12. end
 
 . 
 . program test_return_function
   1.     sysuse auto, clear
   2. 
-.     reg mpg price weight trunk 
+.     qui reg mpg price weight trunk 
   3.     matrix vcov_matrix = e(V)
   4. 
 .     estimate_supt_critical_value, vcov_matrix(vcov_matrix)
@@ -68,6 +69,27 @@ Notes:
   6. 
 .     di "Test passed"
   7. end 
+
+. 
+. program test_stability
+  1.     sysuse auto, clear
+  2. 
+.     qui reg mpg price weight trunk 
+  3.     matrix vcov_matrix = e(V)
+  4. 
+.     estimate_supt_critical_value, vcov_matrix(vcov_matrix)
+  5.     local critical_value_r1 = r(critical_value)
+  6. 
+.     qui reg mpg price weight trunk 
+  7.     matrix vcov_matrix = e(V)
+  8. 
+.     estimate_supt_critical_value, vcov_matrix(vcov_matrix)
+  9.     local critical_value_r2 = r(critical_value)
+ 10. 
+.     assert `critical_value_r1' == `critical_value_r2'
+ 11. 
+.     di "Test passed"
+ 12. end 
 
 . 
 . program test_wrong_covariance_matrix
@@ -107,22 +129,8 @@ Notes:
 . * EXECUTE
 . main
 (1978 Automobile Data)
-
-      Source |       SS           df       MS      Number of obs   =        74
--------------+----------------------------------   F(3, 70)        =     44.55
-       Model |  1603.57067         3  534.523558   Prob > F        =    0.0000
-    Residual |  839.888787        70  11.9984112   R-squared       =    0.6563
--------------+----------------------------------   Adj R-squared   =    0.6415
-       Total |  2443.45946        73  33.4720474   Root MSE        =    3.4639
-
-------------------------------------------------------------------------------
-         mpg |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
--------------+----------------------------------------------------------------
-       price |  -.0001035   .0001636    -0.63   0.529    -.0004298    .0002228
-      weight |  -.0054181   .0007962    -6.81   0.000    -.0070061   -.0038302
-       trunk |  -.1024431   .1283954    -0.80   0.428    -.3585196    .1536335
-       _cons |   39.70451   1.659272    23.93   0.000     36.39519    43.01382
-------------------------------------------------------------------------------
+Test passed
+(1978 Automobile Data)
 Test passed
 Test passed
 Test passed

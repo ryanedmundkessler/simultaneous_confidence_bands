@@ -6,8 +6,6 @@ from python_lib.make_utils import *
 
 clear_dirs(['../output/'])
 
-run_stata(program = 'basic_functionality.do')
-run_stata(program = 'monte_carlo.do')
+run_stata(program = 'example.do')
 
 shutil.rmtree('python_lib')
-raw_input('\n Press <Enter> to exit')

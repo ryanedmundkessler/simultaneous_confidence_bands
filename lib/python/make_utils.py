@@ -2,16 +2,12 @@ import os, sys, subprocess, shutil
 
 LOG_DIR_DEFAULT = '../output/'
 
-def run_python(program, log_dir = LOG_DIR_DEFAULT):
+def run_python(program, log_dir = './'):
 
-    log_file   = program.replace('.py', '.log') 
-    cmd        = 'python {0}'.format(program)
+    cmd = 'python {0}'.format(program)
 
     print('\nExecuting: {0}'.format(cmd))
-
-    with open(log_dir + log_file, 'w') as log:
-        subprocess.call(cmd, shell = True, stdout = log) 
-        log.close()
+    subprocess.call(cmd, shell = True) 
 
 def run_stata(program, log_dir = LOG_DIR_DEFAULT):
     
