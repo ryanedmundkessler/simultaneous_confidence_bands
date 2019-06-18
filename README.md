@@ -1,9 +1,9 @@
 
 # Computing Simultaneous Confidence Bands in Stata
 
-Simultaneous confidence bands are versatile tools for visualizing estimation uncertainty for parameter vectors ([Montiel Olea and Plagborg-Møller 2018](https://scholar.princeton.edu/sites/default/files/mikkelpm/files/conf_band.pdf)). 
+Simultaneous confidence bands are versatile tools for visualizing estimation uncertainty for parameter vectors ([Montiel Olea and Plagborg-Møller 2019](https://onlinelibrary.wiley.com/doi/full/10.1002/jae.2656)). 
 
-This repo houses a [Stata](https://www.stata.com/) function that computes the critical values underlying the simultaneous sup-t confidence bands proposed in [Montiel Olea and Plagborg-Møller (2018)](https://scholar.princeton.edu/sites/default/files/mikkelpm/files/conf_band.pdf). 
+This repo houses a [Stata](https://www.stata.com/) function that computes the critical values underlying the simultaneous sup-t confidence bands proposed in [Montiel Olea and Plagborg-Møller (2019)](https://onlinelibrary.wiley.com/doi/full/10.1002/jae.2656). 
 
 ## Installation 
 
@@ -43,4 +43,4 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## References
 
-Montiel Olea, José Luis and Mikkel Plagborg-Møller. 2018. Simultaneous Confidence Bands: Theory, Implementation, and an Application to SVARs. Working paper.
+Montiel Olea, José Luis and Mikkel Plagborg-Møller. 2019. Simultaneous Confidence Bands: Theory, Implementation, and an Application to SVARs. Journal of Applied Econometrics. 
